@@ -1,5 +1,24 @@
 from stack_class import ArrayStack
 
+def checkBrackets(statement):
+    pairs = {')':'(',']': '[', '}': '{'}
+    openings = set(pairs.values())
+    stack = ArrayStack(len(statement))
+
+    for ch in statement:
+        if ch in openings:
+            stack.push(ch)
+        elif ch in pairs:
+            if stack.is_empty(): # 여는 괄호가 없는 경우
+                return False
+            if stack.peek() != paris[ch] # 페어가 안맞는 경우
+                return False
+            stack.pop()
+        else:
+            pass # 괄호 아닌 문자 무시
+
+    return stack.is_empty() # True면 검사 성공, False면 실패
+
 
 
 def test_brackets():
