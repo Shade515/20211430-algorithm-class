@@ -1,0 +1,91 @@
+import time
+
+def factorial_iter(n: int) -> int:
+    if n < 0:
+        raise ValueError("음수는 입력할 수 없습니다.")
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+def factorial_rec(n: int) -> int:
+    if n < 0:
+        raise ValueError("음수는 입력할 수 없습니다.")
+    if n in (0, 1):
+        return 1
+    return n * factorial_rec(n - 1)
+
+def run_with_time(func, n):
+    start = time.perf_counter()
+    result = func(n)
+    end = time.perf_counter()
+    return result, end - start
+
+TEST_VALUES = [0, 1, 2, 3, 5, 10, 15, 20, 30, 50, 100]
+
+def menu():
+    while True:
+        print("\n===== 팩토리얼 계산 프로그램 =====")
+        print("1. 반복문으로 계산 (Iterative)")
+        print("2. 재귀로 계산 (Recursive)")
+        print("3. 두 방식 비교 (Compare)")
+        print("4. 테스트 데이터 일괄 실행 (표 출력)")
+        print("0. 종료")
+        choice = input("메뉴를 선택하세요: ").strip()
+
+        if choice == "0":
+            print("프로그램을 종료합니다.")
+            break
+
+        elif choice in ("1", "2", "3"):
+            n_str = input("정수 n을 입력하세요: ").strip()
+            if not n_str.isdigit():
+                print("❌ 오류: 정수를 입력해야 합니다.")
+                continue
+            n = int(n_str)
+            try:
+                if choice == "1":
+                    result, t = run_with_time(factorial_iter, n)
+                    print(f"[반복] {n}! = {result}")
+                    print(f"실행 시간: {t:.6f}초")
+                elif choice == "2":
+                    result, t = run_with_time(factorial_rec, n)
+                    print(f"[재귀] {n}! = {result}")
+                    print(f"실행 시간: {t:.6f}초")
+                elif choice == "3":
+                    iter_result, iter_time = run_with_time(factorial_iter, n)
+                    rec_result, rec_time = run_with_time(factorial_rec, n)
+                    print(f"\n{n}! 비교 결과:")
+                    print(f"  반복 결과: {iter_result}")
+                    print(f"  재귀 결과: {rec_result}")
+                    print(f"  결과 일치: {iter_result == rec_result}")
+                    print(f"  반복 실행 시간: {iter_time:.6f}초")
+                    print(f"  재귀 실행 시간: {rec_time:.6f}초")
+            except ValueError as e:
+                print(f"❌ 오류: {e}")
+            except RecursionError as e:
+                print(f"❌ 재귀 깊이 초과: {e}")
+
+        elif choice == "4":
+            print("\n--- 테스트 데이터 실행 (표 형태) ---")
+            print(f"{'n':>5} | {'일치':^6} | {'반복시간(s)':>12} | {'재귀시간(s)':>12} | 결과 일부")
+            print("-" * 65)
+            for n in TEST_VALUES:
+                try:
+                    iter_result, iter_time = run_with_time(factorial_iter, n)
+                    rec_result, rec_time = run_with_time(factorial_rec, n)
+                    same = iter_result == rec_result
+                    # n! 값이 너무 길면 앞부분만 표시
+                    fact_str = str(iter_result)
+                    short_fact = fact_str if len(fact_str) < 20 else fact_str[:17] + "..."
+                    print(f"{n:5d} | {str(same):^6} | {iter_time:12.6f} | {rec_time:12.6f} | {short_fact}")
+                except RecursionError:
+                    print(f"{n:5d} | {'오류':^6} | {'-':>12} | {'-':>12} | 재귀 깊이 초과")
+            print("-" * 65)
+            print("테스트 완료!\n")
+
+        else:
+            print("❌ 잘못된 입력입니다. 0~4 중에서 선택하세요.")
+
+if __name__ == "__main__":
+    menu()
